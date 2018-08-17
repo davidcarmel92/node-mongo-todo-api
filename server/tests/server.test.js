@@ -15,7 +15,7 @@ describe('POST /todos', () => {
   it('should create new todo', (done) => {
     const text ='todo text';
 
-    request(app).post('/todos').send({text}).expect(200).expect((res) => {
+    request(app).post('/todos').set('x-auth', users[0].tokens[0].token).send({text}).expect(200).expect((res) => {
       expect(res.body.text).toBe(text)
     }).end((err, res) => {
       if(err) {
@@ -31,7 +31,7 @@ describe('POST /todos', () => {
   });
 
   it('should not create todo with invalid data', (done) => {
-    request(app).post('/todos').send({}).expect(400).end((err,res) => {
+    request(app).post('/todos').set('x-auth', users[0].tokens[0].token).send({}).expect(400).end((err,res) => {
       if(err){
         return done(err);
       }
@@ -45,8 +45,8 @@ describe('POST /todos', () => {
 
 describe('GET /todos', () => {
   it('should get all todos', (done) => {
-    request(app).get('/todos').expect(200).expect((res) => {
-      expect(res.body.todos.length).toBe(2)
+    request(app).set('x-auth', users[0].tokens[0].token).get('/todos').expect(200).expect((res) => {
+      expect(res.body.todos.length).toBe(1)
     }).end(done)
   });
 });
@@ -157,33 +157,29 @@ describe('GET /users/me', () => {
   });
 });
 
-describe('POST /users', () => {
-  // it('should create a user', (done) => {
-  //   const email ='example@hotmail.com';
-  //   const password = 'abc123';
-  //
-  //   request(app)
-  //   .post('./users')
-  //   .send({email, password})
-  //   .expect(200)
-  //   .expect((res) => {
-  //     expect(res.headers['x-auth']).toExist();
-  //     expect(res.body._id).toExist();
-  //     expect(res.body.email).toBe(email);
-  //   }).end(done);
-  // });
-
-  it('should return errors if request invalid', (done) => {
-    const email = '123e23.e';
-    const password = '2e'
-
-    request(app)
-    .post('./users')
-    .send({email, password})
-    .expect(400).end(done)
-  });
-  //
-  // it('should not create user if email in use', (done) => {
-  //
-  // });
-})
+// describe('POST users/login', () => {
+//   it('should login user and create auth token', (done) => {
+//     request(app)
+//     .post('/users/login')
+//     .send({
+//       email: users[1].email,
+//       password: users[1].password
+//     }).expect(200)
+//     .expect((res) => {
+//       expect(res.headers['x-auth']).toExist()
+//     })
+//     .end((err,res) => {
+//       if(err){
+//         return done(err)
+//       }
+//
+//       User.findById(users[1]._id).then((user) => {
+//         expect(user.tokens[0]).toInclude({
+//           access: 'auth',
+//           token: res.headers['x-auth']
+//         });
+//         done()
+//       }).catch(e => done(e))
+//     })
+//   })
+// });
